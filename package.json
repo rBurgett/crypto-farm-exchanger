@@ -1,0 +1,45 @@
+{
+  "name": "crypto-farm-exchanger",
+  "version": "0.1.0",
+  "description": "crypto-farm-exchanger",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd build && electron .",
+    "build": "node build.js && cd build && yarn install --production && cd .. && babel src --out-dir build",
+    "watch": "babel src --watch --out-dir build"
+  },
+  "repository": "git+https://github.com/rBurgett/crypto-farm-exchanger.git",
+  "author": "Ryan Burgett <ryan@burgettweb.net>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/rBurgett/crypto-farm-exchanger/issues"
+  },
+  "homepage": "https://github.com/rBurgett/crypto-farm-exchanger#readme",
+  "private": true,
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-react": "^6.24.1",
+    "electron": "^1.7.10",
+    "electron-builder": "^19.52.1",
+    "eslint": "^4.15.0",
+    "eslint-plugin-react": "^7.5.1"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "fs-extra-promise": "^1.0.1",
+    "jquery": "^3.2.1",
+    "lodash": "^4.17.4",
+    "money": "^0.2.0",
+    "open-exchange-rates": "^0.3.0",
+    "prop-types": "^15.6.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "rmrf-promise": "^1.1.0",
+    "shapeshift.io": "^1.3.1",
+    "sweetalert": "^2.1.0"
+  }
+}
