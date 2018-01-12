@@ -15,7 +15,8 @@ app.on('ready', () => {
 
     const dataPath = app.getPath('userData');
 
-    const ordersDB = new Datastore({ filename: path.join(dataPath, 'orders.db'), autoload: true });
+    const orderDB = new Datastore({ filename: path.join(dataPath, 'orders.db'), autoload: true });
+    const addressDB = new Datastore({ filename: path.join(dataPath, 'addresses.db'), autoload: true });
 
     const appWindow = new BrowserWindow({
         show: false,
@@ -29,7 +30,7 @@ app.on('ready', () => {
     });
 
     const sendOrders = () => {
-        ordersDB.find({}, (err, docs) => {
+        orderDB.find({}, (err, docs) => {
             if(err) {
                 console.error(err);
             } else {
@@ -39,7 +40,7 @@ app.on('ready', () => {
     };
 
     ipcMain.on('createOrder', (e, order) => {
-        ordersDB.insert(order, err => {
+        orderDB.insert(order, err => {
             if(err) {
                 console.error(err);
             } else {
@@ -50,6 +51,30 @@ app.on('ready', () => {
 
     ipcMain.on('getOrders', () => {
         sendOrders();
+    });
+
+    const sendAddresses = () => {
+        addressDB.find({}, (err, docs) => {
+            if(err) {
+                console.error(err);
+            } else {
+                appWindow.send('addresses', docs);
+            }
+        });
+    };
+
+    ipcMain.on('createAddress', (e, { coin, address }) => {
+        addressDB.update({ coin }, { coin, address }, { upsert: true }, err => {
+            if(err) {
+                console.error(err);
+            } else {
+                sendAddresses();
+            }
+        });
+    });
+
+    ipcMain.on('getAddresses', () => {
+        sendAddresses();
     });
 
 });

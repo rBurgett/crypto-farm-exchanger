@@ -18,8 +18,6 @@ const handleError = err => {
     swal('Oops!', err.message, 'error');
 };
 
-window.fx = fx;
-
 const updateRates = async function() {
     await new Promise(resolve => {
         oxr.latest(() => resolve());
@@ -87,7 +85,8 @@ class App extends Component {
             btcMarketInfo: '',
             receiveAmount: '',
             coins: [],
-            orders: []
+            orders: [],
+            addresses: []
         };
         bindAll(this, [
             'onDepositCoinChange',
@@ -156,8 +155,15 @@ class App extends Component {
                         .sort((a, b) => a.expiration === b.expiration ? 0 : a.expiration > b.expiration ? -1 : 1)
                 });
             });
-
             ipcRenderer.send('getOrders');
+
+            ipcRenderer.on('addresses', (e, addresses) => {
+                this.setState({
+                    ...this.state,
+                    addresses
+                });
+            });
+            ipcRenderer.send('getAddresses');
 
         } catch(err) {
             handleError(err);
@@ -165,10 +171,12 @@ class App extends Component {
     }
 
     async onDepositCoinChange(coin) {
-        const { receiveCoin } = this.state;
+        const { receiveCoin, addresses } = this.state;
+        const addressObj = addresses.find(a => a.coin === coin) || {};
         this.setState({
             ...this.state,
-            depositCoin: coin
+            depositCoin: coin,
+            refundAddress: addressObj.address ? addressObj.address : ''
         });
         const [ marketInfo, btcMarketInfo ] = await getMarketInfo(coin, receiveCoin);
         this.setState({
@@ -179,10 +187,12 @@ class App extends Component {
     }
 
     async onReceiveCoinChange(coin) {
-        const { depositCoin } = this.state;
+        const { depositCoin, addresses } = this.state;
+        const addressObj = addresses.find(a => a.coin === coin) || {};
         this.setState({
             ...this.state,
-            receiveCoin: coin
+            receiveCoin: coin,
+            receiveAddress: addressObj.address ? addressObj.address : ''
         });
         const [ marketInfo, btcMarketInfo ] = await getMarketInfo(depositCoin, coin);
         this.setState({
@@ -194,11 +204,13 @@ class App extends Component {
 
     async onCoinSwitch() {
         const { state } = this;
-        const { depositCoin, receiveCoin } = state;
+        const { depositCoin, refundAddress, receiveCoin, receiveAddress } = state;
         this.setState({
             ...state,
             depositCoin: receiveCoin,
-            receiveCoin: depositCoin
+            refundAddress: receiveAddress,
+            receiveCoin: depositCoin,
+            receiveAddress: refundAddress
         });
         const [ marketInfo, btcMarketInfo ] = await getMarketInfo(receiveCoin, depositCoin);
         this.setState({
@@ -232,7 +244,9 @@ class App extends Component {
     async onSubmit(e) {
         try {
             e.preventDefault();
-            const { receiveCoin, depositCoin, receiveAmount, receiveAddress, refundAddress } = this.state;
+            const { receiveCoin, depositCoin, receiveAmount } = this.state;
+            const refundAddress = this.state.refundAddress.trim();
+            const receiveAddress = this.state.receiveAddress.trim();
             const pair = depositCoin.toLowerCase() + '_' + receiveCoin.toLowerCase();
             const options = {
                 returnAddress: refundAddress,
@@ -255,7 +269,10 @@ class App extends Component {
                     }
                 });
             });
+
             await ipcRenderer.send('createOrder', orderData);
+            await ipcRenderer.send('createAddress', { coin: depositCoin, address: refundAddress });
+            await ipcRenderer.send('createAddress', { coin: receiveCoin, address: receiveAddress });
 
             await swal({
                 title: 'Order successfully processed!',
