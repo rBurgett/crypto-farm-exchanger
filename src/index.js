@@ -2,7 +2,6 @@ const electron = require('electron');
 const Datastore = require('nedb');
 const path = require('path');
 
-
 const { ipcMain } = electron;
 
 process.on('uncaughtException', err => {
@@ -10,6 +9,8 @@ process.on('uncaughtException', err => {
 });
 
 const { app, BrowserWindow } = electron;
+
+let windows = [];
 
 app.on('ready', () => {
 
@@ -23,6 +24,7 @@ app.on('ready', () => {
         width: 700,
         height: 485
     });
+    windows.push(appWindow);
 
     appWindow.loadURL(`file://${__dirname}/index.html`);
     appWindow.once('ready-to-show', () => {
@@ -34,7 +36,9 @@ app.on('ready', () => {
             if(err) {
                 console.error(err);
             } else {
-                appWindow.send('orders', docs);
+                for(const w of windows) {
+                    w.send('orders', docs);
+                }
             }
         });
     };
@@ -45,6 +49,16 @@ app.on('ready', () => {
                 console.error(err);
             } else {
                 sendOrders();
+            }
+        });
+    });
+
+    ipcMain.on('updateOrder', (e, order, skip) => {
+        orderDB.update({ _id: order._id }, order, err => {
+            if(err) {
+                console.error(err);
+            } else {
+                if(!skip) sendOrders();
             }
         });
     });
@@ -75,6 +89,24 @@ app.on('ready', () => {
 
     ipcMain.on('getAddresses', () => {
         sendAddresses();
+    });
+
+    ipcMain.on('showOrders', () => {
+        const ordersWindow = new BrowserWindow({
+            show: false,
+            width: 700,
+            height: 485
+        });
+        windows.push(ordersWindow);
+
+        ordersWindow.loadURL(`file://${__dirname}/orders.html`);
+        ordersWindow.once('ready-to-show', () => {
+            ordersWindow.show();
+        });
+        ordersWindow.on('close', () => {
+            windows = windows.filter(w => w !== ordersWindow);
+        });
+
     });
 
 });

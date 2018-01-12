@@ -69,6 +69,14 @@ const getDollarAmount = (amount, marketInfo) => {
 const styles = {
     header: {
         marginTop: 10
+    },
+    ordersButton: {
+        fontSize: 20,
+        lineHeight: '20px',
+        paddingLeft: 7,
+        paddingRight: 9,
+        paddingTop: 5,
+        paddingBottom: 5
     }
 };
 
@@ -95,7 +103,8 @@ class App extends Component {
             'onReceiveAmountChange',
             'onReceiveAddressChange',
             'onRefundAddressChange',
-            'onSubmit'
+            'onSubmit',
+            'onShowOrdersClick'
         ]);
     }
 
@@ -298,6 +307,11 @@ class App extends Component {
         }
     }
 
+    onShowOrdersClick(e) {
+        e.preventDefault();
+        ipcRenderer.send('showOrders');
+    }
+
     render() {
 
         const { state } = this;
@@ -320,7 +334,10 @@ class App extends Component {
             <div className={'container-fluid'}>
                 <div className={'row'}>
                     <div className={'col-sm-12'}>
-                        <h2 style={styles.header} className={'text-center'}>Crypto Farm Exchanger</h2>
+                        <div>
+                            <button type={'button'} className={'btn btn-default pull-right'} style={styles.ordersButton}><span className={'glyphicon glyphicon-list-alt'} onClick={this.onShowOrdersClick}></span></button>
+                            <h2 style={styles.header} className={'text-center'}>Crypto Farm Exchanger</h2>
+                        </div>
                     </div>
                 </div>
                 <div className={'row'}>
