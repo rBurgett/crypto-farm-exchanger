@@ -10,8 +10,8 @@ app.on('ready', () => {
 
     const appWindow = new BrowserWindow({
         show: false,
-        width: 500,
-        height: 500
+        width: 600,
+        height: 485
     });
 
     appWindow.loadURL(`file://${__dirname}/index.html`);
