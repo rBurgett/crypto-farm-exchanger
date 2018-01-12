@@ -59,4 +59,5 @@ typings/
 
 .idea
 /build
+/build-native
 .DS_Store

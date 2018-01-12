@@ -1,6 +1,8 @@
+import fs from 'fs-extra-promise';
 import fx from 'money';
 import moment from 'moment';
 import oxr from 'open-exchange-rates';
+import path from 'path';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import shapeshift from 'shapeshift.io';
@@ -11,7 +13,9 @@ import { ipcRenderer } from 'electron';
 import CoinSelector from './components/coin-selector';
 import ExchangeForm from './components/exchange-form';
 
-oxr.set({ app_id: process.env.EXCHANGE_KEY });
+const { EXCHANGE_KEY } = fs.readJsonSync(path.join(__dirname, '.env'));
+
+oxr.set({ app_id: EXCHANGE_KEY });
 
 const handleError = err => {
     console.error(err);
@@ -322,7 +326,7 @@ class App extends Component {
         let receiveDollars;
         if(coins && receiveAmount && receiveAmount && btcMarketInfo && btcMarketInfo.pair) {
             receiveDollars = getDollarAmount(receiveAmount, btcMarketInfo).toFixed(2);
-        } else if(receiveCoin === 'BTC') {
+        } else if(receiveAmount && receiveCoin === 'BTC') {
             receiveDollars = fx(Number(receiveAmount)).from('BTC').to('USD').toFixed(2);
         } else {
             receiveDollars = '';

@@ -14,6 +14,8 @@ const { omit } = require('lodash');
         await fs.copyAsync(path.join('public', file), path.join(buildPath, file));
     }
 
+    await fs.copyAsync('.env', path.join(buildPath, '.env'));
+
     const packageJSON = await fs.readJsonAsync('package.json');
     const newPackageJSON = omit(packageJSON, [
         'build',

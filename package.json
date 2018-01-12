@@ -6,7 +6,10 @@
   "scripts": {
     "start": "cd build && electron .",
     "build": "node build.js && cd build && yarn install --production && cd .. && babel src --out-dir build",
-    "watch": "babel src --watch --out-dir build"
+    "watch": "babel src --watch --out-dir build",
+    "build-native": "electron-builder --dir",
+    "pack-native": "electron-builder",
+    "complete-build": "npm run build && npm run pack-native"
   },
   "repository": "git+https://github.com/rBurgett/crypto-farm-exchanger.git",
   "author": "Ryan Burgett <ryan@burgettweb.net>",
@@ -43,5 +46,42 @@
     "rmrf-promise": "^1.1.0",
     "shapeshift.io": "^1.3.1",
     "sweetalert": "^2.1.0"
+  },
+  "build": {
+    "electronVersion": "1.7.10",
+    "appId": "net.mlgacryptofarm.crypto-farm-exchanger",
+    "productName": "Crypto Farm Exchanger",
+    "copyright": "Copyright © 2018 by mlgacryptofarm.net",
+    "directories": {
+      "app": "build",
+      "output": "build-native"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "public/images/favicon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.other",
+      "icon": "public/images/crypto-farm-exchanger.icns"
+    },
+    "linux": {
+      "target": "deb",
+      "icon": "./public/images/linux-icons/",
+      "synopsis": "Crypto Farm Exchanger - Copyright 2018 by Ryan Burgett. Learn more at mlgacryptofarm.net.",
+      "description": "Crypto Farm Exchanger - Copyright 2018 by Ryan Burgett. Learn more at mlgacryptofarm.net.",
+      "category": "Other",
+      "desktop": {
+        "Name": "Crypto Farm Exchanger"
+      }
+    }
   }
 }
