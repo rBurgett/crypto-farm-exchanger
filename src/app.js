@@ -271,6 +271,11 @@ class App extends Component {
                 button: 'Close'
             });
 
+            this.setState({
+                ...this.state,
+                receiveAmount: ''
+            });
+
         } catch(err) {
             handleError(err);
         }
