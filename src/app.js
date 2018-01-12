@@ -335,7 +335,7 @@ class App extends Component {
                 <div className={'row'}>
                     <div className={'col-sm-12'}>
                         <div>
-                            <button type={'button'} className={'btn btn-default pull-right'} style={styles.ordersButton}><span className={'glyphicon glyphicon-list-alt'} onClick={this.onShowOrdersClick}></span></button>
+                            <button type={'button'} className={'btn btn-default pull-right'} style={styles.ordersButton} onClick={this.onShowOrdersClick}><span className={'icon icon-list'}></span></button>
                             <h2 style={styles.header} className={'text-center'}>Crypto Farm Exchanger</h2>
                         </div>
                     </div>

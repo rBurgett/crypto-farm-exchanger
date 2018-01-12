@@ -74,7 +74,7 @@ const CoinSelector = ({ depositCoin, receiveCoin, coins, onDepositCoinChange, on
                 </div>
                 <div style={styles.centerColumn}>
                     <div className={'text-center'}>
-                        <a href={'#'} onClick={onSwitchClick}><span style={styles.switchIcon} className={'glyphicon glyphicon-retweet'}></span></a>
+                        <a href={'#'} onClick={onSwitchClick}><span style={styles.switchIcon} className={'icon icon-cycle'}></span></a>
                     </div>
                 </div>
                 <div style={styles.receiveColumn}>

@@ -55,7 +55,6 @@ class Orders extends Component {
                                     if(err) {
                                         reject(err);
                                     } else {
-                                        console.log(data);
                                         resolve(data);
                                     }
                                 });
