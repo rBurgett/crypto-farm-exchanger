@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const ExchangeForm = ({ coins, depositCoin, receiveCoin, receiveAmount, receiveDollars, onReceiveAmountChange, receiveAddress, onReceiveAddressChange, refundAddress, onRefundAddressChange }) => {
+const ExchangeForm = ({ coins, depositCoin, receiveCoin, receiveAmount, receiveDollars, onReceiveAmountChange, receiveAddress, onReceiveAddressChange, refundAddress, onRefundAddressChange, marketInfo }) => {
 
     const depositCoinObj = coins.find(c => c.symbol === depositCoin);
     const receiveCoinObj = coins.find(c => c.symbol === receiveCoin);
@@ -27,7 +27,7 @@ const ExchangeForm = ({ coins, depositCoin, receiveCoin, receiveAmount, receiveD
             <div className={'row'}>
                 <div className={'col-sm-12'}>
                     <div className={'form-group'}>
-                        <label>{`How much ${receiveCoinObj.name} do you want to receive?`} <span className={'text-muted'} style={styles.receiveLabelNote}>{`(approx. $${receiveDollars})`}</span></label>
+                        <label>{`How much ${receiveCoinObj.name} do you want to receive?`} <span className={'text-muted'} style={styles.receiveLabelNote}>{`(approx. $${receiveDollars} + miner fee of ${marketInfo.minerFee} ${receiveCoin})`}</span></label>
                         <input type={'text'} className={'form-control text-center'} value={receiveAmount} onChange={receiveAmountChanged} />
                     </div>
                 </div>
@@ -59,9 +59,10 @@ ExchangeForm.propTypes = {
     receiveDollars: PropTypes.string,
     receiveAddress: PropTypes.string,
     refundAddress: PropTypes.string,
+    marketInfo: PropTypes.object,
     onReceiveAmountChange: PropTypes.func,
     onReceiveAddressChange: PropTypes.func,
-    onRefundAddressAddressChange: PropTypes.func
+    onRefundAddressChange: PropTypes.func
 };
 
 export default ExchangeForm;

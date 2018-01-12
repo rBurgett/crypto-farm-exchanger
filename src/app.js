@@ -1,10 +1,12 @@
 import fx from 'money';
+import moment from 'moment';
 import oxr from 'open-exchange-rates';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import shapeshift from 'shapeshift.io';
 import swal from 'sweetalert';
 import { bindAll } from 'lodash';
+import { ipcRenderer } from 'electron';
 
 import CoinSelector from './components/coin-selector';
 import ExchangeForm from './components/exchange-form';
@@ -84,7 +86,8 @@ class App extends Component {
             marketInfo: '',
             btcMarketInfo: '',
             receiveAmount: '',
-            coins: []
+            coins: [],
+            orders: []
         };
         bindAll(this, [
             'onDepositCoinChange',
@@ -92,7 +95,8 @@ class App extends Component {
             'onCoinSwitch',
             'onReceiveAmountChange',
             'onReceiveAddressChange',
-            'onRefundAddressChange'
+            'onRefundAddressChange',
+            'onSubmit'
         ]);
     }
 
@@ -144,6 +148,16 @@ class App extends Component {
 
             // update the exchange rates every fifteen minutes
             setInterval(() => updateRates(), 60 * 15 * 1000);
+
+            ipcRenderer.on('orders', (e, orders) => {
+                this.setState({
+                    ...this.state,
+                    orders: orders
+                        .sort((a, b) => a.expiration === b.expiration ? 0 : a.expiration > b.expiration ? -1 : 1)
+                });
+            });
+
+            ipcRenderer.send('getOrders');
 
         } catch(err) {
             handleError(err);
@@ -215,12 +229,59 @@ class App extends Component {
         });
     }
 
+    async onSubmit(e) {
+        try {
+            e.preventDefault();
+            const { receiveCoin, depositCoin, receiveAmount, receiveAddress, refundAddress } = this.state;
+            const pair = depositCoin.toLowerCase() + '_' + receiveCoin.toLowerCase();
+            const options = {
+                returnAddress: refundAddress,
+                amount: receiveAmount
+            };
+
+            swal({
+                title: 'Processing Order...',
+                buttons: false,
+                closeOnClickOutside: false,
+                closeOnEsc: false
+            });
+
+            const orderData = await new Promise((resolve, reject) => {
+                shapeshift.shift(receiveAddress, pair, options, (err, data) => {
+                    if(err) {
+                        reject(err);
+                    } else {
+                        resolve(data);
+                    }
+                });
+            });
+            await ipcRenderer.send('createOrder', orderData);
+
+            await swal({
+                title: 'Order successfully processed!',
+                text: [
+                    'Payment Amount:',
+                    orderData.depositAmount + ' ' + depositCoin,
+                    '\n',
+                    'Payment Address:',
+                    orderData.deposit,
+                    '\n',
+                    `Please send the amount above to the payment address by ${moment(new Date(orderData.expiration)).format('LT')}.`
+                ].join('\n'),
+                button: 'Close'
+            });
+
+        } catch(err) {
+            handleError(err);
+        }
+    }
+
     render() {
 
         const { state } = this;
         console.log('state', state);
 
-        const { coins, depositCoin, refundAddress, receiveCoin, receiveAddress, receiveAmount, btcMarketInfo } = this.state;
+        const { coins, depositCoin, refundAddress, receiveCoin, receiveAddress, receiveAmount, marketInfo, btcMarketInfo } = this.state;
 
         let receiveDollars;
         if(coins && receiveAmount && receiveAmount && btcMarketInfo && btcMarketInfo.pair) {
@@ -265,10 +326,11 @@ class App extends Component {
                             onReceiveAddressChange={this.onReceiveAddressChange}
                             refundAddress={refundAddress}
                             onRefundAddressChange={this.onRefundAddressChange}
+                            marketInfo={marketInfo}
                         />
                         <div className={'row'}>
                             <div className={'col-sm-12'}>
-                                <button type={'button'} className={'btn btn-success center-block'} disabled={enableSubmitButton ? false : true}>Submit Order</button>
+                                <button type={'button'} className={'btn btn-success center-block'} disabled={enableSubmitButton ? false : true} onClick={this.onSubmit}>Submit Order</button>
                             </div>
                         </div>
                     </div>
