@@ -257,6 +257,19 @@ class App extends Component {
     async onSubmit(e) {
         try {
             e.preventDefault();
+
+            const confirmed = await swal({
+                title: 'User Agreement',
+                text: 'Use of this software may carry financial risk, and is to be used as an experimental software utility only. In no event shall the application developers or MLGA Crypto Farm be liable or responsible for any damages, claims, applications, losses, injuries, delays, accidents, costs, business interruption costs, or other expenses. The application developers and MLGA Crypto Farm are hereby released by you from liability for any and all Losses.',
+                type: 'warning',
+                buttons: {
+                    confirm: 'I agree. Continue.',
+                    cancel: 'Cancel'
+                }
+            });
+
+            if(!confirmed) return;
+
             const { receiveCoin, depositCoin, receiveAmount } = this.state;
             const refundAddress = this.state.refundAddress.trim();
             const receiveAddress = this.state.receiveAddress.trim();
