@@ -12,6 +12,8 @@ const { app, BrowserWindow } = electron;
 
 let windows = [];
 
+const windowHeight = process.platform === 'darwin' ? 485 : 530;
+
 app.on('ready', () => {
 
     const dataPath = app.getPath('userData');
@@ -22,7 +24,7 @@ app.on('ready', () => {
     const appWindow = new BrowserWindow({
         show: false,
         width: 700,
-        height: 485
+        height: windowHeight
     });
     windows.push(appWindow);
 
@@ -100,7 +102,7 @@ app.on('ready', () => {
             x: x + 30,
             y: y + 30,
             width: 700,
-            height: 485
+            height: windowHeight
         });
         windows.push(ordersWindow);
 
