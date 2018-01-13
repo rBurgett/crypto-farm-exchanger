@@ -92,8 +92,13 @@ app.on('ready', () => {
     });
 
     ipcMain.on('showOrders', () => {
+
+        const { x, y } = appWindow.getBounds();
+
         const ordersWindow = new BrowserWindow({
             show: false,
+            x: x + 30,
+            y: y + 30,
             width: 700,
             height: 485
         });
