@@ -3,13 +3,13 @@ const fs = require('fs-extra-promise');
 const Datastore = require('nedb');
 const path = require('path');
 
-const { ipcMain } = electron;
+const { ipcMain, Menu } = electron;
 
 process.on('uncaughtException', err => {
     console.error(err);
 });
 
-const { app, BrowserWindow } = electron;
+const { app, BrowserWindow, shell } = electron;
 
 let windows = [];
 
@@ -122,6 +122,46 @@ app.on('ready', () => {
         });
 
     });
+
+    const menuTemplate = [];
+
+    // File Menu
+    menuTemplate.push({
+        label: 'File',
+        submenu: [
+            { role: 'quit' }
+        ]
+    });
+
+    // Edit Menu
+    menuTemplate.push({
+        label: 'Edit',
+        submenu: [
+            { role: 'undo' },
+            { role: 'redo' },
+            { type: 'separator' },
+            { role: 'cut' },
+            { role: 'copy' },
+            { role: 'paste' },
+            { role: 'selectall' }
+        ]
+    });
+
+    // Help Menu
+    menuTemplate.push({
+        label: 'Help',
+        submenu: [
+            {
+                label: 'Visit the Crypto Farm',
+                click: () => {
+                    shell.openExternal('https://mlgacryptofarm.net');
+                }
+            }
+        ]
+    });
+
+    const appMenu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(appMenu);
 
 });
 
