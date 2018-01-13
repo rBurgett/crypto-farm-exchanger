@@ -1,4 +1,5 @@
 const electron = require('electron');
+const fs = require('fs-extra-promise');
 const Datastore = require('nedb');
 const path = require('path');
 
@@ -16,7 +17,13 @@ const windowHeight = process.platform === 'darwin' ? 485 : 530;
 
 app.on('ready', () => {
 
-    const dataPath = app.getPath('userData');
+    let dataPath;
+    if(process.platform === 'win32') {
+        const { name } = fs.readJSONSync(path.join(__dirname, 'package.json'));
+        dataPath = path.join(process.env.LOCALAPPDATA, name);
+    } else {
+        dataPath = app.getPath('userData');
+    }
 
     const orderDB = new Datastore({ filename: path.join(dataPath, 'orders.db'), autoload: true });
     const addressDB = new Datastore({ filename: path.join(dataPath, 'addresses.db'), autoload: true });
