@@ -13,7 +13,7 @@ const { app, BrowserWindow, shell } = electron;
 
 let windows = [];
 
-const windowHeight = process.platform === 'darwin' ? 485 : 510;
+const windowHeight = process.platform === 'win32' ? 530 : process.platform === 'darwin' ? 485 : 510;
 
 app.on('ready', () => {
 
